@@ -10,10 +10,15 @@ export class UserService {
   }
 
   public async createUser(
-    reqUserBody: CreateUser["body"]
+    reqUser: CreateUser["body"]
   ): Promise<CreateUserResponse> {
-    const user = await this.userRepository.createUser(reqUserBody);
-    const userResponse = user as CreateUserResponse;
+    const user = await this.userRepository.createUser(reqUser);
+    const userResponse: CreateUserResponse = {
+      email: user.email,
+      name: user.name,
+      phone: user.phone,
+      role: user.role,
+    };
     return userResponse;
   }
 }
