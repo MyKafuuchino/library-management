@@ -1,11 +1,15 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, User } from "@prisma/client";
+import { CreateUser } from "../route/user/user.validator";
+import { BaseRepository } from "./utils/base.repository";
 
-export class userRepository {
-  private prisma: PrismaClient;
-
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma;
+export class UserRepository extends BaseRepository {
+  constructor(prismaClient: PrismaClient) {
+    super(prismaClient);
   }
 
-  static async createUser() {}
+  public async createUser(reqUserBody: CreateUser["body"]): Promise<User> {
+    return this.prisma.user.create({
+      data: reqUserBody,
+    });
+  }
 }
