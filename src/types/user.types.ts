@@ -1,3 +1,5 @@
+import { Role } from "@prisma/client";
+
 export type UserResponse = {
   id: number;
   name: string;
@@ -16,7 +18,9 @@ export type GetUsersResponse = UserResponse;
 export type GetUserByIdResponse = UserResponse | null;
 
 export type UserLoginRequest = {
+  id: number;
   email: string;
+  role: Role;
   password: string;
 };
 

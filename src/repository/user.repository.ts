@@ -51,8 +51,10 @@ export class UserRepository extends BaseRepository {
         email: reqUser.body.email,
       },
       select: {
+        id: true,
         email: true,
         password: true,
+        role: true,
       },
     });
   }

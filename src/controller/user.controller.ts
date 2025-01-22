@@ -114,7 +114,7 @@ export class UserController {
 
       res.status(200).json(NewResponseSuccess(deleteUserResponse));
     } catch (error) {
-      next(error)
+      next(error);
     }
   };
 }

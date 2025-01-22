@@ -9,6 +9,7 @@ import {
   getUserByIdSchema,
   updateUserSchema,
 } from "./user.validator";
+import { protectRouteByRole } from "../../middleware/protect_route.by_role.middleware";
 
 const userRepository = new UserRepository(prismaClient);
 const userService = new UserService(userRepository);
@@ -16,22 +17,29 @@ const userController = new UserController(userService);
 
 const userRouter = HttpRouter();
 
-userRouter.get("", userController.getUsers);
+userRouter.get("", protectRouteByRole("ADMIN"), userController.getUsers);
 userRouter.get(
   "/:userId",
   validate(getUserByIdSchema),
-  userController.getUserById
+  userController.getUserById,
 );
-userRouter.post("", validate(createUserSchema), userController.createUser);
+userRouter.post(
+  "",
+  protectRouteByRole("ADMIN"),
+  validate(createUserSchema),
+  userController.createUser,
+);
 userRouter.put(
   "/:userId",
+  protectRouteByRole("ADMIN"),
   validate(updateUserSchema),
-  userController.updateUserById
+  userController.updateUserById,
 );
 userRouter.delete(
   "/:userId",
+  protectRouteByRole("ADMIN"),
   validate(getUserByIdSchema),
-  userController.deleteUserById
+  userController.deleteUserById,
 );
 
 export default userRouter;

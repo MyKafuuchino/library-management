@@ -12,6 +12,7 @@ import {
 } from "../types/user.types";
 import { hashPassword } from "../utils/bcrypt";
 import { CustomError } from "../utils/custom_error";
+import { USR_ERROR_CODES } from "../constant/error.constant";
 
 export class UserService {
   private userRepository: UserRepository;
@@ -21,17 +22,15 @@ export class UserService {
   }
 
   public async getUsers(): Promise<GetUsersResponse[]> {
-    const usersResponse: GetUsersResponse[] =
-      await this.userRepository.getUsers();
-    return usersResponse;
+    return await this.userRepository.getUsers();
   }
 
   public async getUserById(reqUser: GetUserById): Promise<GetUserByIdResponse> {
     const user = await this.userRepository.findUserById(reqUser);
     if (!user) {
-      throw new CustomError("User not found", "USER_NOT_FOUND", 404);
+      throw new CustomError("User not found", "USER_NOT_FOUND", "NOT_FOUND");
     }
-    const userResponse: GetUserByIdResponse = {
+    return {
       id: user.id,
       email: user.email,
       name: user.name,
@@ -39,13 +38,22 @@ export class UserService {
       isActive: user.isActive,
       role: user.role,
     };
-    return userResponse;
   }
 
   public async createUser(reqUser: CreateUser): Promise<CreateUserResponse> {
+    const isUserAlreadyExist =
+      await this.userRepository.findUserByEmail(reqUser);
+
+    if (isUserAlreadyExist) {
+      throw new CustomError(
+        "User already exist",
+        USR_ERROR_CODES.USER_ALREADY_EXISTS,
+        "CONFLICT",
+      );
+    }
     reqUser.body.password = await hashPassword(reqUser.body.password);
     const user = await this.userRepository.createUser(reqUser);
-    const userResponse: CreateUserResponse = {
+    return {
       id: user.id,
       email: user.email,
       name: user.name,
@@ -53,15 +61,18 @@ export class UserService {
       role: user.role,
       isActive: user.isActive,
     };
-    return userResponse;
   }
 
   public async updateUserById(
-    reqUser: UpdateUser
+    reqUser: UpdateUser,
   ): Promise<UpdateUserResponse> {
     const userExist = await this.userRepository.findUserById(reqUser);
     if (!userExist) {
-      throw new CustomError("User not found", "USER_NOT_FOUND", 404);
+      throw new CustomError(
+        "User not found",
+        USR_ERROR_CODES.USER_NOT_FOUND,
+        "NOT_FOUND",
+      );
     }
 
     if (reqUser.body.password) {
@@ -71,10 +82,14 @@ export class UserService {
     const updatedUser = await this.userRepository.updateUserById(reqUser);
 
     if (!updatedUser) {
-      throw new CustomError("Failed to update user", "USER_UPDATE_FAILED", 404);
+      throw new CustomError(
+        "Failed to update user",
+        "USER_UPDATE_FAILED",
+        "NOT_FOUND",
+      );
     }
 
-    const updatedUserResponse: UpdateUserResponse = {
+    return {
       id: updatedUser.id,
       email: updatedUser.email,
       name: updatedUser.name,
@@ -82,14 +97,16 @@ export class UserService {
       role: updatedUser.role,
       isActive: updatedUser.isActive,
     };
-
-    return updatedUserResponse;
   }
 
   public async deleteUserById(reqUser: GetUserById): Promise<string> {
     const userExist = await this.userRepository.findUserById(reqUser);
     if (!userExist) {
-      throw new CustomError("User not found", "USER_NOT_FOUND", 404);
+      throw new CustomError(
+        "User not found",
+        USR_ERROR_CODES.USER_NOT_FOUND,
+        "NOT_FOUND",
+      );
     }
     await this.userRepository.deleteUserById(reqUser);
     return "Delete user successfully";
