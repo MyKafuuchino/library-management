@@ -17,9 +17,10 @@ export class AuthService {
       throw new CustomError("invalid email ", "ACCESS_DENIED", 403);
     }
 
-    console.log(isUserExist.password);
-    const isPasswordSame = await verifyPassword(isUserExist.password);
-    
+    const isPasswordSame = await verifyPassword(
+      reqLogin.body.password,
+      isUserExist.password
+    );
 
     if (!isPasswordSame) {
       throw new CustomError("invalid  password", "ACCESS_DENIED", 403);
