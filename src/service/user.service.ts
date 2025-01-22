@@ -27,7 +27,7 @@ export class UserService {
   }
 
   public async getUserById(reqUser: GetUserById): Promise<GetUserByIdResponse> {
-    const user = await this.userRepository.getUserById(reqUser);
+    const user = await this.userRepository.findUserById(reqUser);
     if (!user) {
       throw new CustomError("User not found", "USER_NOT_FOUND", 404);
     }
@@ -59,7 +59,7 @@ export class UserService {
   public async updateUserById(
     reqUser: UpdateUser
   ): Promise<UpdateUserResponse> {
-    const userExist = await this.userRepository.getUserById(reqUser);
+    const userExist = await this.userRepository.findUserById(reqUser);
     if (!userExist) {
       throw new CustomError("User not found", "USER_NOT_FOUND", 404);
     }
@@ -87,7 +87,7 @@ export class UserService {
   }
 
   public async deleteUserById(reqUser: GetUserById): Promise<string> {
-    const userExist = await this.userRepository.getUserById(reqUser);
+    const userExist = await this.userRepository.findUserById(reqUser);
     if (!userExist) {
       throw new CustomError("User not found", "USER_NOT_FOUND", 404);
     }

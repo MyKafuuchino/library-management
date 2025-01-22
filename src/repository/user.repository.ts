@@ -3,9 +3,15 @@ import {
   CreateUser,
   GetUserById,
   UpdateUser,
+  UserLogin,
 } from "../route/user/user.validator";
 import { BaseRepository } from "./utils/base.repository";
-import { GetUsersResponse, UserResponse } from "../types/user.types";
+import {
+  GetUsersResponse,
+  UserLoginRequest,
+  UserLoginResponse,
+  UserResponse,
+} from "../types/user.types";
 
 export class UserRepository extends BaseRepository {
   constructor(prismaClient: PrismaClient) {
@@ -31,10 +37,22 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public getUserById(reqUser: GetUserById): Promise<User | null> {
+  public findUserById(reqUser: GetUserById): Promise<User | null> {
     return this.prisma.user.findFirst({
       where: {
         id: reqUser.params.userId,
+      },
+    });
+  }
+
+  public findUserByEmail(reqUser: UserLogin): Promise<UserLoginRequest | null> {
+    return this.prisma.user.findFirst({
+      where: {
+        email: reqUser.body.email,
+      },
+      select: {
+        email: true,
+        password: true,
       },
     });
   }
@@ -48,12 +66,12 @@ export class UserRepository extends BaseRepository {
     });
   }
 
-  public async deleteUserById (reqUser : GetUserById) : Promise<boolean> {
+  public async deleteUserById(reqUser: GetUserById): Promise<boolean> {
     const deleteUser = await this.prisma.user.delete({
-      where : {
-        id : reqUser.params.userId
-      }
-    })
-    return Boolean(deleteUser)
+      where: {
+        id: reqUser.params.userId,
+      },
+    });
+    return Boolean(deleteUser);
   }
 }

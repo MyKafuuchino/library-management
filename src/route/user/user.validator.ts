@@ -41,6 +41,14 @@ export const getUserByIdSchema = z.object({
   }),
 });
 
+export const userLoginSchema = z.object({
+  body: z.object({
+    email: z.string().email(),
+    password: z.string().min(6, "Password must have at least 6 character"),
+  }),
+});
+
 export type CreateUser = z.infer<typeof createUserSchema>;
 export type UpdateUser = z.infer<typeof updateUserSchema>;
 export type GetUserById = z.infer<typeof getUserByIdSchema>;
+export type UserLogin = z.infer<typeof userLoginSchema>;
