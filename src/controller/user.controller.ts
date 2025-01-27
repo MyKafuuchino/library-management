@@ -1,12 +1,8 @@
-import {
-  CreateUser,
-  GetUserById,
-  UpdateUser,
-} from "../route/user/user.validator";
-import { UserService } from "../service/user.service";
-import { CreateUserResponse } from "../types/user.types";
-import { HttpRequest, HttpResponse, HttpNextFunction } from "../utils/http";
-import { NewResponseSuccess } from "../utils/http_response";
+import {HTTP_STATUSES} from "../constant/http_status.constant";
+import {GetUserById, UpdateUser} from "../route/user/user.validator";
+import {UserService} from "../service/userServiceImpl";
+import {HttpRequest, HttpResponse, HttpNextFunction} from "../utils/http";
+import {NewResponseSuccess} from "../utils/http_response";
 
 export class UserController {
   private readonly userService: UserService;
@@ -16,24 +12,24 @@ export class UserController {
   }
 
   public getUsers = async (
-    req: HttpRequest,
-    res: HttpResponse,
-    next: HttpNextFunction
+      _req: HttpRequest,
+      res: HttpResponse,
+      next: HttpNextFunction,
   ): Promise<void> => {
     try {
       const getUsersResponse = await this.userService.getUsers();
       res
-        .status(200)
-        .json(NewResponseSuccess("User get successfully", getUsersResponse));
+          .status(HTTP_STATUSES.OK)
+          .json(NewResponseSuccess("User get successfully", getUsersResponse));
     } catch (error) {
       next(error);
     }
   };
 
   public getUserById = async (
-    req: HttpRequest,
-    res: HttpResponse,
-    next: HttpNextFunction
+      req: HttpRequest,
+      res: HttpResponse,
+      next: HttpNextFunction,
   ): Promise<void> => {
     try {
       const reqUser: GetUserById = {
@@ -43,42 +39,22 @@ export class UserController {
       };
       const getUserByIdResponse = await this.userService.getUserById(reqUser);
       res
-        .status(200)
-        .json(
-          NewResponseSuccess("User get by id successfully", getUserByIdResponse)
-        );
-    } catch (error) {
-      next(error);
-    }
-  };
-
-  public createUser = async (
-    req: HttpRequest,
-    res: HttpResponse,
-    next: HttpNextFunction
-  ): Promise<void> => {
-    try {
-      const reqUser: CreateUser = {
-        body: req.body,
-      };
-      const createUserResponse = await this.userService.createUser(reqUser);
-      res
-        .status(201)
-        .json(
-          NewResponseSuccess<CreateUserResponse>(
-            "User created successfully",
-            createUserResponse
-          )
-        );
+          .status(HTTP_STATUSES.OK)
+          .json(
+              NewResponseSuccess(
+                  "User get by id successfully",
+                  getUserByIdResponse,
+              ),
+          );
     } catch (error) {
       next(error);
     }
   };
 
   public updateUserById = async (
-    req: HttpRequest,
-    res: HttpResponse,
-    next: HttpNextFunction
+      req: HttpRequest,
+      res: HttpResponse,
+      next: HttpNextFunction,
   ): Promise<void> => {
     try {
       const reqUser: UpdateUser = {
@@ -89,19 +65,19 @@ export class UserController {
       };
       const updateUserResponse = await this.userService.updateUserById(reqUser);
       res
-        .status(200)
-        .json(
-          NewResponseSuccess("User updated successfully", updateUserResponse)
-        );
+          .status(HTTP_STATUSES.OK)
+          .json(
+              NewResponseSuccess("User updated successfully", updateUserResponse),
+          );
     } catch (error) {
       next(error);
     }
   };
 
   public deleteUserById = async (
-    req: HttpRequest,
-    res: HttpResponse,
-    next: HttpNextFunction
+      req: HttpRequest,
+      res: HttpResponse,
+      next: HttpNextFunction,
   ): Promise<void> => {
     try {
       const reqUser: GetUserById = {
@@ -112,7 +88,7 @@ export class UserController {
 
       const deleteUserResponse = await this.userService.deleteUserById(reqUser);
 
-      res.status(200).json(NewResponseSuccess(deleteUserResponse));
+      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess(deleteUserResponse));
     } catch (error) {
       next(error);
     }

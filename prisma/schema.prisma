@@ -15,18 +15,20 @@ model User {
   phone     String   @db.VarChar(255)
   isActive  Boolean  @default(true)
   role      Role     @default(USER)
-  loans     Loans[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  loans Loans[]
 }
 
 model Category {
   id          Int      @id @default(autoincrement())
   name        String   @db.VarChar(255)
   description String   @db.VarChar(255)
-  books       Book[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  books Book[]
 }
 
 model Book {
@@ -37,8 +39,11 @@ model Book {
   category   String   @db.VarChar(255)
   stock      Int      @db.Int
   categoryId Int      @db.Int
-  loans      Loans[]
-  Category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  loans    Loans[]
+  Category Category @relation(fields: [categoryId], references: [id])
 }
 
 model Loans {
