@@ -3,6 +3,7 @@ import {BaseRepository} from "./utils/base.repository";
 import {CustomError} from "../utils/custom_error";
 import {CreateBook, CreateBooks, FindBookById, UpdateBook} from "../route/book/book.validator";
 import {createSlug} from "../utils/createSlug";
+import {FindCategoryById} from "../route/category/category.validator";
 
 export interface BookRepository {
   findAll(): Promise<Book[]>;
@@ -16,6 +17,8 @@ export interface BookRepository {
   update(reqBook: UpdateBook): Promise<Book>;
 
   deleteOne(reqBook: FindBookById): Promise<boolean>;
+
+  findAllByCategory(reqBook: FindCategoryById): Promise<Book[]>;
 }
 
 export class BookRepositoryImpl extends BaseRepository implements BookRepository {
@@ -71,5 +74,16 @@ export class BookRepositoryImpl extends BaseRepository implements BookRepository
   public async deleteOne(reqBook: FindBookById): Promise<boolean> {
     await this.prisma.book.delete({where: {id: reqBook.params.id}});
     return true;
+  }
+
+  public async findAllByCategory(reqBook: FindCategoryById): Promise<Book[]> {
+    return this.prisma.book.findMany({
+      where: {
+        categoryId: reqBook.params.id
+      },
+      orderBy: {
+        slug: 'asc'
+      }
+    });
   }
 }

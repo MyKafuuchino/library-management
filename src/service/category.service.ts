@@ -2,6 +2,8 @@ import {CategoryResponse} from "../types/category.types";
 import {CreateCategory, FindCategoryById, UpdateCategory} from "../route/category/category.validator";
 import {CategoryRepository} from "../repository/category.repository";
 import {CustomError} from "../utils/custom_error";
+import {BookRepository} from "../repository/book.repository";
+import {BookResponse} from "../types/book.types";
 
 export interface CategoryService {
   getAllCategory(): Promise<CategoryResponse[]>
@@ -13,13 +15,17 @@ export interface CategoryService {
   update(reqCategory: UpdateCategory): Promise<CategoryResponse>
 
   delete(reqCategory: FindCategoryById): Promise<CategoryResponse>
+
+  getAllBooksByCategory(reqCategory: FindCategoryById): Promise<BookResponse[]>
 }
 
 export class CategoryServiceImpl implements CategoryService {
   categoryRepository: CategoryRepository
+  bookRepository: BookRepository
 
-  constructor(categoryRepository: CategoryRepository) {
+  constructor(categoryRepository: CategoryRepository, bookRepository: BookRepository) {
     this.categoryRepository = categoryRepository;
+    this.bookRepository = bookRepository;
   }
 
   public async getAllCategory(): Promise<CategoryResponse[]> {
@@ -53,5 +59,15 @@ export class CategoryServiceImpl implements CategoryService {
     }
     await this.categoryRepository.delete(reqCategory)
     return category
+  }
+
+  public async getAllBooksByCategory(reqCategory: FindCategoryById): Promise<BookResponse[]> {
+    const books = await this.bookRepository.findAllByCategory(reqCategory);
+
+    if (books.length === 0) {
+      throw new CustomError("Books not found with this category", "NOT_FOUND")
+    }
+
+    return books
   }
 }

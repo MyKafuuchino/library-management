@@ -74,4 +74,19 @@ export class CategoryController {
       next(err)
     }
   }
+
+  public getAllBooksByCategory = async (req: HttpRequest, res: HttpResponse, next: HttpNextFunction) => {
+    try {
+      const categoryReq: FindCategoryById = {
+        params: {
+          id: parseInt(req.params["id"])
+        }
+      }
+
+      const booksResponse = await this.categoryService.getAllBooksByCategory(categoryReq)
+      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Get all books by category successfully", booksResponse));
+    } catch (err) {
+      next(err)
+    }
+  }
 }

@@ -87,5 +87,4 @@ export class BookController {
       next(err)
     }
   }
-
 }
