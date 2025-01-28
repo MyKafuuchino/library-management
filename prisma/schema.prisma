@@ -34,9 +34,8 @@ model Category {
 model Book {
   id         Int      @id @default(autoincrement())
   title      String   @db.VarChar(255)
+  slug       String   @unique @db.VarChar(255)
   author     String   @db.VarChar(255)
-  isbn       String   @db.VarChar(255)
-  category   String   @db.VarChar(255)
   stock      Int      @db.Int
   categoryId Int      @db.Int
   createdAt  DateTime @default(now())

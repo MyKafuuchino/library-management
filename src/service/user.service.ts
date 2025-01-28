@@ -1,4 +1,4 @@
-import {UserRepository} from "../repository/userRepositoryImpl";
+import {UserRepository} from "../repository/user.repository";
 import {GetUserById, UpdateUser} from "../route/user/user.validator";
 import {
   GetUserByIdResponse,
@@ -7,7 +7,6 @@ import {
 } from "../types/user.types";
 import {hashPassword} from "../utils/bcrypt";
 import {CustomError} from "../utils/custom_error";
-import {USR_ERROR_CODES} from "../constant/error.constant";
 
 export interface UserService {
   getUsers(): Promise<GetUsersResponse[]>
@@ -35,7 +34,7 @@ export class UserServiceImpl implements UserService {
   public async getUserById(reqUser: GetUserById): Promise<GetUserByIdResponse> {
     const user = await this.userRepository.findById(reqUser);
     if (!user) {
-      throw new CustomError("User not found", "USER_NOT_FOUND", "NOT_FOUND");
+      throw new CustomError("User not found", "NOT_FOUND");
     }
     return {
       id: user.id,
@@ -55,7 +54,6 @@ export class UserServiceImpl implements UserService {
     if (!userExist) {
       throw new CustomError(
           "User not found",
-          USR_ERROR_CODES.USER_NOT_FOUND,
           "NOT_FOUND",
       );
     }
@@ -69,7 +67,6 @@ export class UserServiceImpl implements UserService {
     if (!updatedUser) {
       throw new CustomError(
           "Failed to update user",
-          "USER_UPDATE_FAILED",
           "NOT_FOUND",
       );
     }
@@ -89,7 +86,6 @@ export class UserServiceImpl implements UserService {
     if (!userExist) {
       throw new CustomError(
           "User not found",
-          USR_ERROR_CODES.USER_NOT_FOUND,
           "NOT_FOUND",
       );
     }

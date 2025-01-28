@@ -1,13 +1,13 @@
 import {prismaClient} from "../../config/client";
 import {UserController} from "../../controller/user.controller";
 import {validate} from "../../middleware/validate.middleware";
-import {UserRepositoryImpl} from "../../repository/userRepositoryImpl";
-import {UserServiceImpl} from "../../service/userServiceImpl";
+import {UserRepository} from "../../repository/user.repository";
+import {UserServiceImpl} from "../../service/user.service";
 import {HttpRouter} from "../../utils/http";
 import {getUserByIdSchema, updateUserSchema} from "./user.validator";
 import {protectRouteByRole} from "../../middleware/protect_route.by_role.middleware";
 
-const userRepository = new UserRepositoryImpl(prismaClient);
+const userRepository = new UserRepository(prismaClient);
 const userService = new UserServiceImpl(userRepository);
 const userController = new UserController(userService);
 
@@ -15,18 +15,18 @@ const userRouter = HttpRouter();
 
 userRouter.get("", protectRouteByRole("ADMIN"), userController.getUsers);
 userRouter.get(
-    "/:userId",
+    "/:id",
     validate(getUserByIdSchema),
     userController.getUserById
 );
 userRouter.put(
-    "/:userId",
+    "/:id",
     protectRouteByRole("ADMIN"),
     validate(updateUserSchema),
     userController.updateUserById
 );
 userRouter.delete(
-    "/:userId",
+    "/:id",
     protectRouteByRole("ADMIN"),
     validate(getUserByIdSchema),
     userController.deleteUserById

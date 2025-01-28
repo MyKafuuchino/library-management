@@ -7,8 +7,6 @@ export type UserResponse = {
     isActive: boolean;
 };
 
-export type CreateUserResponse = UserResponse;
-
 export type UpdateUserResponse = UserResponse;
 
 export type GetUsersResponse = UserResponse;

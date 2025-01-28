@@ -13,7 +13,7 @@ const errorHandler = (
   if (err instanceof CustomError) {
     res
         .status(err.statusCode)
-        .json(NewResponseError(err.message, err.errorCode));
+        .json(NewResponseError(err.message));
   } else if (err instanceof ZodError) {
     const validationErrors = err.errors.map((error) => ({
       path: error.path.join("."),
@@ -24,7 +24,6 @@ const errorHandler = (
         .json(
             NewResponseError(
                 "Validation Error",
-                "VALIDATION_ERROR",
                 validationErrors
             )
         );

@@ -1,13 +1,13 @@
 import {HTTP_STATUSES} from "../constant/http_status.constant";
 import {GetUserById, UpdateUser} from "../route/user/user.validator";
-import {UserService} from "../service/userServiceImpl";
+import {UserServiceImpl} from "../service/user.service";
 import {HttpRequest, HttpResponse, HttpNextFunction} from "../utils/http";
 import {NewResponseSuccess} from "../utils/http_response";
 
 export class UserController {
-  private readonly userService: UserService;
+  private readonly userService: UserServiceImpl;
 
-  constructor(userService: UserService) {
+  constructor(userService: UserServiceImpl) {
     this.userService = userService;
   }
 
@@ -34,7 +34,7 @@ export class UserController {
     try {
       const reqUser: GetUserById = {
         params: {
-          userId: parseInt(req.params["userId"]),
+          id: parseInt(req.params["id"]),
         },
       };
       const getUserByIdResponse = await this.userService.getUserById(reqUser);
@@ -60,7 +60,7 @@ export class UserController {
       const reqUser: UpdateUser = {
         body: req.body,
         params: {
-          userId: parseInt(req.params["userId"]),
+          id: parseInt(req.params["id"]),
         },
       };
       const updateUserResponse = await this.userService.updateUserById(reqUser);
@@ -82,7 +82,7 @@ export class UserController {
     try {
       const reqUser: GetUserById = {
         params: {
-          userId: parseInt(req.params["userId"]),
+          id: parseInt(req.params["id"]),
         },
       };
 

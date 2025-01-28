@@ -5,12 +5,12 @@ import {
 } from "../route/auth/auth.validator";
 import {HttpNextFunction, HttpRequest, HttpResponse} from "../utils/http";
 import {NewResponseSuccess} from "../utils/http_response";
-import {AuthService} from "../service/authServiceImpl";
+import {AuthServiceImpl} from "../service/auth.service";
 
 export class AuthController {
-  private authService: AuthService;
+  private authService: AuthServiceImpl;
 
-  constructor(authService: AuthService) {
+  constructor(authService: AuthServiceImpl) {
     this.authService = authService;
   }
 

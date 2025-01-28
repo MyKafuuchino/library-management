@@ -1,11 +1,7 @@
-import {UserRepositoryImpl} from "../repository/userRepositoryImpl";
+import {UserRepository} from "../repository/user.repository";
 import {verifyPassword} from "../utils/bcrypt";
 import {CustomError} from "../utils/custom_error";
 import {generateToken} from "../utils/jwt";
-import {
-  COMMON_ERROR_CODES,
-  USR_ERROR_CODES,
-} from "../constant/error.constant";
 import {
   UserRegisterRequest,
   UserLoginRequest,
@@ -19,9 +15,9 @@ export interface AuthService {
 }
 
 export class AuthServiceImpl implements AuthService {
-  private userRepository: UserRepositoryImpl;
+  private userRepository: UserRepository;
 
-  constructor(userRepository: UserRepositoryImpl) {
+  constructor(userRepository: UserRepository) {
     this.userRepository = userRepository;
   }
 
@@ -30,7 +26,6 @@ export class AuthServiceImpl implements AuthService {
     if (!isUserExist) {
       throw new CustomError(
           "invalid email ",
-          USR_ERROR_CODES.USER_NOT_FOUND,
           "FORBIDDEN"
       );
     }
@@ -44,7 +39,6 @@ export class AuthServiceImpl implements AuthService {
     if (isPasswordSame) {
       throw new CustomError(
           "invalid  password",
-          COMMON_ERROR_CODES.PERMISSION_DENIED,
           "FORBIDDEN"
       );
     }
