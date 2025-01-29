@@ -1,12 +1,12 @@
-import {UserRepository} from "../repository/user.repository";
-import {verifyPassword} from "../utils/bcrypt";
-import {CustomError} from "../utils/custom_error";
-import {generateToken} from "../utils/jwt";
+import { UserRepository } from "../repository/user.repository";
+import { verifyPassword } from "../utils/bcrypt";
+import { CustomError } from "../utils/custom_error";
+import { generateToken } from "../utils/jwt";
 import {
   UserRegisterRequest,
   UserLoginRequest,
 } from "../route/auth/auth.validator";
-import {UserLoginResponse, UserRegisterResponse} from "../types/auth.types";
+import { UserLoginResponse, UserRegisterResponse } from "../types/auth.types";
 
 export interface AuthService {
   login(reqUser: UserLoginRequest): Promise<UserLoginResponse>;
@@ -24,23 +24,17 @@ export class AuthServiceImpl implements AuthService {
   public async login(reqLogin: UserLoginRequest): Promise<UserLoginResponse> {
     const isUserExist = await this.userRepository.findByEmail(reqLogin);
     if (!isUserExist) {
-      throw new CustomError(
-          "invalid email ",
-          "FORBIDDEN"
-      );
+      throw new CustomError("invalid email or password", "FORBIDDEN");
     }
 
     const isPasswordSame = await verifyPassword(
-        isUserExist.password,
-        reqLogin.body.password
+      isUserExist.password,
+      reqLogin.body.password
     );
-    console.log(isPasswordSame)
+    console.log(isPasswordSame);
 
     if (isPasswordSame) {
-      throw new CustomError(
-          "invalid  password",
-          "FORBIDDEN"
-      );
+      throw new CustomError("invalid username or password", "FORBIDDEN");
     }
 
     const jwtToken = generateToken({
@@ -55,7 +49,7 @@ export class AuthServiceImpl implements AuthService {
   }
 
   public async register(
-      reqRegister: UserRegisterRequest
+    reqRegister: UserRegisterRequest
   ): Promise<UserRegisterResponse> {
     const user = await this.userRepository.create(reqRegister);
 
