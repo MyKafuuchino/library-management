@@ -1,12 +1,12 @@
-import { UserRepository } from "../repository/user.repository";
-import { verifyPassword } from "../utils/bcrypt";
-import { CustomError } from "../utils/custom_error";
-import { generateToken } from "../utils/jwt";
+import {UserRepositoryImpl} from "../repository/user.repository";
+import {verifyPassword} from "../utils/bcrypt";
+import {CustomError} from "../utils/custom_error";
+import {generateToken} from "../utils/jwt";
 import {
   UserRegisterRequest,
   UserLoginRequest,
 } from "../route/auth/auth.validator";
-import { UserLoginResponse, UserRegisterResponse } from "../types/auth.types";
+import {UserLoginResponse, UserRegisterResponse} from "../types/auth.types";
 
 export interface AuthService {
   login(reqUser: UserLoginRequest): Promise<UserLoginResponse>;
@@ -15,9 +15,9 @@ export interface AuthService {
 }
 
 export class AuthServiceImpl implements AuthService {
-  private userRepository: UserRepository;
+  private userRepository: UserRepositoryImpl;
 
-  constructor(userRepository: UserRepository) {
+  constructor(userRepository: UserRepositoryImpl) {
     this.userRepository = userRepository;
   }
 
@@ -28,10 +28,9 @@ export class AuthServiceImpl implements AuthService {
     }
 
     const isPasswordSame = await verifyPassword(
-      isUserExist.password,
-      reqLogin.body.password
+        isUserExist.password,
+        reqLogin.body.password
     );
-    console.log(isPasswordSame);
 
     if (isPasswordSame) {
       throw new CustomError("invalid username or password", "FORBIDDEN");
@@ -49,7 +48,7 @@ export class AuthServiceImpl implements AuthService {
   }
 
   public async register(
-    reqRegister: UserRegisterRequest
+      reqRegister: UserRegisterRequest
   ): Promise<UserRegisterResponse> {
     const user = await this.userRepository.create(reqRegister);
 

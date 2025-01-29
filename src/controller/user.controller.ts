@@ -1,5 +1,5 @@
 import {HTTP_STATUSES} from "../constant/http_status.constant";
-import {GetUserById, UpdateUser} from "../route/user/user.validator";
+import {FindUserById, UpdateUser} from "../route/user/user.validator";
 import {UserServiceImpl} from "../service/user.service";
 import {HttpRequest, HttpResponse, HttpNextFunction} from "../utils/http";
 import {NewResponseSuccess} from "../utils/http_response";
@@ -32,7 +32,7 @@ export class UserController {
       next: HttpNextFunction,
   ): Promise<void> => {
     try {
-      const reqUser: GetUserById = {
+      const reqUser: FindUserById = {
         params: {
           id: parseInt(req.params["id"]),
         },
@@ -80,7 +80,7 @@ export class UserController {
       next: HttpNextFunction,
   ): Promise<void> => {
     try {
-      const reqUser: GetUserById = {
+      const reqUser: FindUserById = {
         params: {
           id: parseInt(req.params["id"]),
         },

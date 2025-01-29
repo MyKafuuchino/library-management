@@ -47,8 +47,8 @@ model Book {
 
 model Loan {
   id         Int       @id @default(autoincrement())
-  userId     Int?
-  bookId     Int?
+  userId     Int
+  bookId     Int
   borrowDate DateTime  @default(now())
   returnDate DateTime?
   isReturned Boolean   @default(false)

@@ -1,5 +1,5 @@
-import {UserRepository} from "../repository/user.repository";
-import {GetUserById, UpdateUser} from "../route/user/user.validator";
+import {UserRepositoryImpl} from "../repository/user.repository";
+import {FindUserById, UpdateUser} from "../route/user/user.validator";
 import {
   GetUserByIdResponse,
   GetUsersResponse,
@@ -11,19 +11,19 @@ import {CustomError} from "../utils/custom_error";
 export interface UserService {
   getUsers(): Promise<GetUsersResponse[]>
 
-  getUserById(reqUser: GetUserById): Promise<GetUserByIdResponse>
+  getUserById(reqUser: FindUserById): Promise<GetUserByIdResponse>
 
-  getUserById(reqUser: GetUserById): Promise<GetUserByIdResponse>
+  getUserById(reqUser: FindUserById): Promise<GetUserByIdResponse>
 
   updateUserById(reqUser: UpdateUser): Promise<UpdateUserResponse>
 
-  deleteUserById(reqUser: GetUserById): Promise<string>
+  deleteUserById(reqUser: FindUserById): Promise<string>
 }
 
 export class UserServiceImpl implements UserService {
-  private userRepository: UserRepository;
+  private userRepository: UserRepositoryImpl;
 
-  constructor(userRepository: UserRepository) {
+  constructor(userRepository: UserRepositoryImpl) {
     this.userRepository = userRepository;
   }
 
@@ -31,7 +31,7 @@ export class UserServiceImpl implements UserService {
     return await this.userRepository.findAll();
   }
 
-  public async getUserById(reqUser: GetUserById): Promise<GetUserByIdResponse> {
+  public async getUserById(reqUser: FindUserById): Promise<GetUserByIdResponse> {
     const user = await this.userRepository.findById(reqUser);
     if (!user) {
       throw new CustomError("User not found", "NOT_FOUND");
@@ -81,7 +81,7 @@ export class UserServiceImpl implements UserService {
     };
   }
 
-  public async deleteUserById(reqUser: GetUserById): Promise<string> {
+  public async deleteUserById(reqUser: FindUserById): Promise<string> {
     const userExist = await this.userRepository.findById(reqUser);
     if (!userExist) {
       throw new CustomError(

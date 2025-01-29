@@ -1,14 +1,14 @@
 import {prismaClient} from "../../config/client";
 import {AuthController} from "../../controller/auth.controller";
 import {validate} from "../../middleware/validate.middleware";
-import {UserRepository} from "../../repository/user.repository";
+import {UserRepositoryImpl} from "../../repository/user.repository";
 import {AuthServiceImpl} from "../../service/auth.service";
 import {HttpRouter} from "../../utils/http";
 import {userLoginSchema, userRegisterSchema} from "./auth.validator";
 
 const authRouter = HttpRouter();
 
-const userRepository = new UserRepository(prismaClient);
+const userRepository = new UserRepositoryImpl(prismaClient);
 const authService = new AuthServiceImpl(userRepository);
 const authController = new AuthController(authService);
 

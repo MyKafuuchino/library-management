@@ -1,5 +1,5 @@
 import {PrismaClient, User} from "@prisma/client";
-import {GetUserById, UpdateUser} from "../route/user/user.validator";
+import {FindUserById, UpdateUser} from "../route/user/user.validator";
 import {BaseRepository} from "./utils/base.repository";
 import {
   UserRegisterRequest,
@@ -11,16 +11,16 @@ export interface UserRepository {
 
   create(reqUser: UserRegisterRequest): Promise<User>;
 
-  findById(reqUser: GetUserById): Promise<User | null>;
+  findById(reqUser: FindUserById): Promise<User | null>;
 
   findByEmail(reqUser: UserLoginRequest): Promise<User | null>;
 
   update(reqUser: UpdateUser): Promise<User | null>;
 
-  delete(reqUser: GetUserById): Promise<boolean>;
+  delete(reqUser: FindUserById): Promise<boolean>;
 }
 
-export class UserRepository extends BaseRepository implements UserRepository {
+export class UserRepositoryImpl extends BaseRepository implements UserRepository {
   constructor(prismaClient: PrismaClient) {
     super(prismaClient);
   }
@@ -35,7 +35,7 @@ export class UserRepository extends BaseRepository implements UserRepository {
     });
   }
 
-  public findById(reqUser: GetUserById): Promise<User | null> {
+  public findById(reqUser: FindUserById): Promise<User | null> {
     return this.prisma.user.findFirst({
       where: {
         id: reqUser.params.id,
@@ -60,7 +60,7 @@ export class UserRepository extends BaseRepository implements UserRepository {
     });
   }
 
-  public async delete(reqUser: GetUserById): Promise<boolean> {
+  public async delete(reqUser: FindUserById): Promise<boolean> {
     const deleteUser = await this.prisma.user.delete({
       where: {
         id: reqUser.params.id,

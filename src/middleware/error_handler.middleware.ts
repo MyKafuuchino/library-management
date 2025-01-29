@@ -40,6 +40,7 @@ const errorHandler = (
           );
     }
   } else {
+    console.log(err);
     res
         .status(500)
         .json(NewResponseError("Internal Server Error", "INTERNAL_SERVER_ERROR"));

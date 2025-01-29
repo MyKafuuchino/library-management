@@ -31,7 +31,7 @@ export class LoanRepositoryImpl extends BaseRepository implements LoanRepository
   }
 
   public async findById(reqLoan: FindLoanById): Promise<Loan | null> {
-    return this.prisma.loan.findUnique({
+    return this.prisma.loan.findFirst({
       where: {
         id: reqLoan.params.id
       }
@@ -39,14 +39,34 @@ export class LoanRepositoryImpl extends BaseRepository implements LoanRepository
   }
 
   public async create(reqLoan: CreateLoan): Promise<Loan> {
+    const createdAt = new Date();
+    const returnDate = new Date(createdAt);
+
+    returnDate.setDate(returnDate.getDate() + 7);
+
     return this.prisma.loan.create({
-      data: reqLoan.body
+      data: {
+        bookId: reqLoan.body.bookId,
+        userId: reqLoan.userId,
+        borrowDate: createdAt,
+        returnDate: returnDate
+      }
     });
   }
 
   public async createMany(reqLoans: CreateLoans): Promise<Loan[]> {
+    const createdAt = new Date();
+    const returnDate = new Date(createdAt);
+
+    returnDate.setDate(returnDate.getDate() + 7);
+
     return Promise.all(reqLoans.body.map((loan) => this.prisma.loan.create({
-      data: loan
+      data: {
+        bookId: loan.bookId,
+        userId: reqLoans.userId,
+        borrowDate: createdAt,
+        returnDate: returnDate
+      }
     })));
   }
 

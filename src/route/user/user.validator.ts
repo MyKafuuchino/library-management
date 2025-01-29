@@ -21,7 +21,7 @@ export const updateUserSchema = z.object({
   }),
 });
 
-export const getUserByIdSchema = z.object({
+export const findUserById = z.object({
   params: z.object({
     id: z.preprocess(
         (value) => (typeof value === "string" ? parseInt(value, 10) : value),
@@ -31,4 +31,4 @@ export const getUserByIdSchema = z.object({
 });
 
 export type UpdateUser = z.infer<typeof updateUserSchema>;
-export type GetUserById = z.infer<typeof getUserByIdSchema>;
+export type FindUserById = z.infer<typeof findUserById>;
