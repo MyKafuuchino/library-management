@@ -22,6 +22,7 @@ export interface BookRepository {
 }
 
 export class BookRepositoryImpl extends BaseRepository implements BookRepository {
+
   public async findAll(): Promise<Book[]> {
     return this.prisma.book.findMany({
       orderBy: {
@@ -68,7 +69,7 @@ export class BookRepositoryImpl extends BaseRepository implements BookRepository
         ...reqBook.body,
         slug: reqBook.body.title ? createSlug(reqBook.body.title) : undefined,
       },
-    })
+    });
   }
 
   public async deleteOne(reqBook: FindBookById): Promise<boolean> {

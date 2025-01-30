@@ -6,6 +6,7 @@ import {
   UpdateLoan,
 } from "../route/loan/loan.validator";
 import {BaseRepository} from "./utils/base.repository";
+import {FindUserById} from "../route/user/user.validator";
 
 export interface LoanRepository {
   findAll(): Promise<Loan[]>;
@@ -19,9 +20,19 @@ export interface LoanRepository {
   update(reqLoan: UpdateLoan): Promise<Loan>;
 
   delete(reqLoan: FindLoanById): Promise<boolean>;
+
+  findByUserId(reqLoan: FindUserById): Promise<Loan[]>;
 }
 
 export class LoanRepositoryImpl extends BaseRepository implements LoanRepository {
+  public async findByUserId(reqLoan: FindUserById): Promise<Loan[]> {
+    return await this.prisma.loan.findMany({
+      where: {
+        userId: reqLoan.params.id
+      }
+    })
+  }
+
   public async findAll(): Promise<Loan[]> {
     return this.prisma.loan.findMany({
       orderBy: {

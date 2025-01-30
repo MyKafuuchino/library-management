@@ -4,7 +4,7 @@ import {LoanResponse} from "../types/loan.types";
 import {CustomError} from "../utils/custom_error";
 import {BookRepository} from "../repository/book.repository";
 import {UserRepository} from "../repository/user.repository";
-import {FindBookById} from "../route/book/book.validator";
+import {FindBookById, UpdateBook} from "../route/book/book.validator";
 import {FindUserById} from "../route/user/user.validator";
 
 export interface LoanService {
@@ -62,6 +62,26 @@ export class LoanServiceImpl implements LoanService {
 
     if (!existBook || !existUser) {
       throw new CustomError(`Book ${reqBook.params.id} or User ${reqUser.params.id} does not exist`, "NOT_FOUND")
+    }
+
+    const totalLoanBook = await this.loanRepository.findByUserId(reqUser)
+
+    if (totalLoanBook.length >= 3) {
+      throw new CustomError("You have reached the maximum book borrowing limit (3 books).", "FORBIDDEN")
+    }
+
+    const updateBookData: UpdateBook = {
+      params: {
+        id: reqBook.params.id
+      }, body: {
+        stock: existBook.stock - 1
+      }
+    }
+
+    const updateBook = await this.bookRepository.update(updateBookData)
+
+    if (updateBook.stock < 0) {
+      throw new CustomError("Book stock has run out", "FORBIDDEN");
     }
 
     return this.loanRepository.create(reqLoan)

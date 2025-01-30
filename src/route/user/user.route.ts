@@ -13,7 +13,7 @@ const userController = new UserController(userService);
 
 const userRouter = HttpRouter();
 
-userRouter.get("", authorizeRoles("ADMIN"), userController.getUsers);
+userRouter.get("", authorizeRoles("ADMIN", "MANAGER"), userController.getUsers);
 userRouter.get(
     "/:id",
     authorizeRoles("MANAGER", "ADMIN"),
