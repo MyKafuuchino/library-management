@@ -14,13 +14,16 @@ export const createLoansSchema = z.object({
 })
 
 export const updateLoanSchema = z.object({
-  body: loanSchema.partial(),
+  body: z.object({
+    bookId: z.number(),
+    isReturned: z.boolean(),
+  }).partial(),
   params: z.object({
     id: zodStringToNumber,
   })
 })
 
-export const findLoanById = z.object({
+export const findLoanByIdSchema = z.object({
   params: z.object({
     id: zodStringToNumber,
   })
@@ -28,5 +31,5 @@ export const findLoanById = z.object({
 
 export type CreateLoan = z.infer<typeof createLoanSchema> & { userId: number }
 export type CreateLoans = z.infer<typeof createLoansSchema> & { userId: number }
-export type UpdateLoan = z.infer<typeof updateLoanSchema> & { userId: number }
-export type FindLoanById = z.infer<typeof findLoanById>
+export type UpdateLoan = z.infer<typeof updateLoanSchema> & { userId: number | undefined }
+export type FindLoanById = z.infer<typeof findLoanByIdSchema>

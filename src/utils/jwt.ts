@@ -1,6 +1,7 @@
-import jwt from "jsonwebtoken";
-import { jwtConfig } from "../config/jwt_config";
-import { UserPayload } from "../types/jwt.types";
+import jwt, {JsonWebTokenError, TokenExpiredError} from "jsonwebtoken";
+import {jwtConfig} from "../config/jwt_config";
+import {UserPayload} from "../types/jwt.types";
+import {CustomError} from "./custom_error";
 
 export function generateToken(payload: UserPayload): string {
   return jwt.sign(payload, jwtConfig.secret, {
@@ -9,5 +10,15 @@ export function generateToken(payload: UserPayload): string {
 }
 
 export function verifyToken(token: string): UserPayload {
-  return <UserPayload>jwt.verify(token, jwtConfig.secret);
+  try {
+    return jwt.verify(token, jwtConfig.secret) as UserPayload;
+  } catch (error) {
+    if (error instanceof TokenExpiredError) {
+      throw new CustomError("Token has expired", "FORBIDDEN");
+    } else if (error instanceof JsonWebTokenError) {
+      throw new CustomError("Invalid token", "FORBIDDEN");
+    } else {
+      throw new CustomError("Token verification failed", "FORBIDDEN");
+    }
+  }
 }

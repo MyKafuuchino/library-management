@@ -91,4 +91,18 @@ export class LoanController {
     }
 
   }
+
+  returnBook = async (req: HttpRequest, res: HttpResponse, next: HttpNextFunction): Promise<void> => {
+    try {
+      const loanReq: FindLoanById = {
+        params: {
+          id: parseInt(req.params["id"]),
+        }
+      }
+      const loanResponse = await this.loanService.returnBook(loanReq);
+      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Returned Book", loanResponse));
+    } catch (err) {
+      next(err)
+    }
+  }
 }

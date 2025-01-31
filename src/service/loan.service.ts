@@ -14,11 +14,11 @@ export interface LoanService {
 
   createLoan(reqLoan: CreateLoan): Promise<LoanResponse>
 
-  // createLoans(reqLoans: CreateLoans): Promise<LoanResponse[]>
-
   updateLoan(reqLoan: UpdateLoan): Promise<LoanResponse>
 
   deleteLoan(reqLoan: FindLoanById): Promise<LoanResponse>
+
+  returnBook(reqLoan: FindLoanById): Promise<LoanResponse>
 }
 
 export class LoanServiceImpl implements LoanService {
@@ -30,6 +30,23 @@ export class LoanServiceImpl implements LoanService {
     this.loanRepository = loanRepository
     this.bookRepository = bookRepository
     this.userRepository = userRepository
+  }
+
+  public async returnBook(reqLoan: FindLoanById): Promise<LoanResponse> {
+    const existLoan = await this.loanRepository.findById(reqLoan)
+    if (!existLoan) {
+      throw new CustomError("Loan is not found", "NOT_FOUND")
+    }
+    const updateLoanData: UpdateLoan = {
+      params: {
+        id: existLoan.id
+      },
+      body: {
+        isReturned: true,
+      },
+      userId: undefined
+    }
+    return this.loanRepository.update(updateLoanData)
   }
 
   public async getAllLoans(): Promise<LoanResponse[]> {
@@ -86,10 +103,6 @@ export class LoanServiceImpl implements LoanService {
 
     return this.loanRepository.create(reqLoan)
   }
-
-  // public async createLoans(reqLoans: CreateLoans): Promise<LoanResponse[]> {
-  //   throw new Error("Method not implemented.");
-  // }
 
   public async updateLoan(reqLoan: UpdateLoan): Promise<LoanResponse> {
 

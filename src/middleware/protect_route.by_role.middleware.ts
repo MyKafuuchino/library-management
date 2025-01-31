@@ -13,8 +13,8 @@ export function authorizeRoles(...roles: (keyof typeof Role)[]) {
     const token = authHeader.split(" ")[1];
     const user = verifyToken(token);
 
-    if (!user || Date.now() >= (user.exp || 0) * 1000) {
-      throw new CustomError("Access denied, token expired", "FORBIDDEN");
+    if (!user) {
+      throw new CustomError("Access denied", "FORBIDDEN");
     }
 
     if (roles.length === 0) {
