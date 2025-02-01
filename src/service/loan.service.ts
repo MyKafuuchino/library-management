@@ -1,14 +1,16 @@
-import {CreateLoan, FindLoanById, UpdateLoan} from "../route/loan/loan.validator";
+import {CreateLoan, FindLoanById, QueryLoan, UpdateLoan} from "../route/loan/loan.validator";
 import {LoanRepository} from "../repository/loan.repository";
-import {LoanResponse} from "../types/loan.types";
+import {LoanResponse, ReturnBookResponse} from "../types/loan.types";
 import {CustomError} from "../utils/custom_error";
 import {BookRepository} from "../repository/book.repository";
 import {UserRepository} from "../repository/user.repository";
 import {FindBookById, UpdateBook} from "../route/book/book.validator";
 import {FindUserById} from "../route/user/user.validator";
+import {PaginationResponse} from "../types/pagination.types";
+import {Loan} from "@prisma/client";
 
 export interface LoanService {
-  getAllLoans(): Promise<LoanResponse[]>;
+  getAllLoans(loanQuery: QueryLoan): Promise<PaginationResponse<Loan[]>>;
 
   getLoanById(reqLoan: FindLoanById): Promise<LoanResponse>
 
@@ -18,7 +20,7 @@ export interface LoanService {
 
   deleteLoan(reqLoan: FindLoanById): Promise<LoanResponse>
 
-  returnBook(reqLoan: FindLoanById): Promise<LoanResponse>
+  returnBook(reqLoan: FindLoanById): Promise<ReturnBookResponse>
 }
 
 export class LoanServiceImpl implements LoanService {
@@ -32,7 +34,7 @@ export class LoanServiceImpl implements LoanService {
     this.userRepository = userRepository
   }
 
-  public async returnBook(reqLoan: FindLoanById): Promise<LoanResponse> {
+  public async returnBook(reqLoan: FindLoanById): Promise<ReturnBookResponse> {
     const existLoan = await this.loanRepository.findById(reqLoan)
     if (!existLoan) {
       throw new CustomError("Loan is not found", "NOT_FOUND")
@@ -46,11 +48,20 @@ export class LoanServiceImpl implements LoanService {
       },
       userId: undefined
     }
-    return this.loanRepository.update(updateLoanData)
+    const data = await this.loanRepository.update(updateLoanData);
+
+    const penalty = data.returnDate
+        ? Math.max(0, (Math.floor((new Date(data.returnDate).getTime() - new Date(data.borrowDate).getTime()) / (1000 * 60 * 60 * 24)) - 7) * 3000)
+        : 0;
+
+    return {
+      ...data,
+      penalty
+    };
   }
 
-  public async getAllLoans(): Promise<LoanResponse[]> {
-    return this.loanRepository.findAll()
+  public async getAllLoans(loanQuery: QueryLoan): Promise<PaginationResponse<Loan[]>> {
+    return this.loanRepository.findAll(loanQuery)
   }
 
   public async getLoanById(reqLoan: FindLoanById): Promise<LoanResponse> {
@@ -81,7 +92,7 @@ export class LoanServiceImpl implements LoanService {
       throw new CustomError(`Book ${reqBook.params.id} or User ${reqUser.params.id} does not exist`, "NOT_FOUND")
     }
 
-    const totalLoanBook = await this.loanRepository.findByUserId(reqUser)
+    const totalLoanBook = await this.loanRepository.findByUserId(reqUser, false)
 
     if (totalLoanBook.length >= 3) {
       throw new CustomError("You have reached the maximum book borrowing limit (3 books).", "FORBIDDEN")

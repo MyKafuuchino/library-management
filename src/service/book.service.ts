@@ -1,12 +1,14 @@
-import {CreateBook, CreateBooks, FindBookById, UpdateBook} from "../route/book/book.validator";
+import {CreateBook, CreateBooks, FindBookById, SearchBookQuery, UpdateBook} from "../route/book/book.validator";
 import {BookResponse} from "../types/book.types";
 import {BookRepository} from "../repository/book.repository";
 import {CategoryRepository} from "../repository/category.repository";
 import {FindCategoryById} from "../route/category/category.validator";
 import {CustomError} from "../utils/custom_error";
+import {PaginationResponse} from "../types/pagination.types";
+import {Book} from "@prisma/client";
 
 export interface BookService {
-  getAllBooks(): Promise<BookResponse[]>;
+  getAllBooks(bookQuery: SearchBookQuery): Promise<PaginationResponse<Book[]>>;
 
   getBookById(reqBook: FindBookById): Promise<BookResponse>;
 
@@ -29,8 +31,8 @@ export class BookServiceImpl implements BookService {
     this.categoryRepository = categoryRepository;
   }
 
-  public async getAllBooks(): Promise<BookResponse[]> {
-    return this.bookRepository.findAll()
+  public async getAllBooks(bookQuery: SearchBookQuery): Promise<PaginationResponse<Book[]>> {
+    return this.bookRepository.findAll(bookQuery)
   }
 
   public async getBookById(reqBook: FindBookById): Promise<BookResponse> {

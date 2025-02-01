@@ -7,6 +7,7 @@ import {
 } from "../types/user.types";
 import {hashPassword} from "../utils/bcrypt";
 import {CustomError} from "../utils/custom_error";
+import {LoanRepository} from "../repository/loan.repository";
 
 export interface UserService {
   getUsers(): Promise<GetUsersResponse[]>
@@ -22,9 +23,15 @@ export interface UserService {
 
 export class UserServiceImpl implements UserService {
   private userRepository: UserRepositoryImpl;
+  private loanRepository: LoanRepository;
 
-  constructor(userRepository: UserRepositoryImpl) {
+  constructor(userRepository: UserRepositoryImpl, loanRepository: LoanRepository) {
     this.userRepository = userRepository;
+    this.loanRepository = loanRepository;
+  }
+
+  public async findLoanByUserId(reqUser: FindUserById): Promise<any> {
+    return this.loanRepository.findByUserId(reqUser);
   }
 
   public async getUsers(): Promise<GetUsersResponse[]> {

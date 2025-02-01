@@ -1,12 +1,13 @@
 import {Book} from "@prisma/client";
 import {BaseRepository} from "./utils/base.repository";
 import {CustomError} from "../utils/custom_error";
-import {CreateBook, CreateBooks, FindBookById, UpdateBook} from "../route/book/book.validator";
+import {CreateBook, CreateBooks, FindBookById, SearchBookQuery, UpdateBook} from "../route/book/book.validator";
 import {createSlug} from "../utils/createSlug";
 import {FindCategoryById} from "../route/category/category.validator";
+import {PaginationResponse} from "../types/pagination.types";
 
 export interface BookRepository {
-  findAll(): Promise<Book[]>;
+  findAll(bookQuery: SearchBookQuery): Promise<PaginationResponse<Book[]>>;
 
   findById(reqBook: FindBookById): Promise<Book>;
 
@@ -23,13 +24,42 @@ export interface BookRepository {
 
 export class BookRepositoryImpl extends BaseRepository implements BookRepository {
 
-  public async findAll(): Promise<Book[]> {
-    return this.prisma.book.findMany({
-      orderBy: {
-        slug: 'asc'
+  public async findAll(bookQuery: SearchBookQuery): Promise<PaginationResponse<Book[]>> {
+    const {page, limit} = bookQuery.pagination
+    const skip = (page - 1) * limit;
+    const query = bookQuery.query;
+
+    const [book, totalBook] = await Promise.all([
+      this.prisma.book.findMany({
+        where: {
+          title: {
+            contains: query.title
+          },
+          author: {
+            contains: query.author
+          },
+        },
+        skip: skip,
+        take: limit,
+        orderBy: {
+          title: "asc"
+        }
+      }),
+      this.prisma.book.count()
+    ])
+
+    const totalPages = Math.ceil(totalBook / limit);
+
+    return {
+      data: book,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: totalBook,
       },
-    })
+    }
   }
+
 
   public async findById(reqBook: FindBookById): Promise<Book> {
     const book = await this.prisma.book.findFirst({where: {id: reqBook.params.id}});

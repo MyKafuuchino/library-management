@@ -1,4 +1,4 @@
-import {FindLoanById, CreateLoan, UpdateLoan} from "../route/loan/loan.validator";
+import {FindLoanById, CreateLoan, UpdateLoan, QueryLoan} from "../route/loan/loan.validator";
 import {LoanService} from "../service/loan.service";
 import {HttpNextFunction, HttpRequest, HttpResponse} from "../utils/http";
 import {HTTP_STATUSES} from "../constant/http_status.constant";
@@ -13,10 +13,16 @@ export class LoanController {
   }
 
 
-  getAllLoans = async (_req: HttpRequest, res: HttpResponse, next: HttpNextFunction): Promise<void> => {
+  getAllLoans = async (req: HttpRequest, res: HttpResponse, next: HttpNextFunction): Promise<void> => {
     try {
-      const loanResponse = await this.loanService.getAllLoans()
-      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Get All loans successfully", loanResponse));
+      const loanQuery: QueryLoan = {
+        pagination: {
+          limit: req.query.limit ? parseInt(req.query.limit as string) : 0,
+          page: req.query.page ? parseInt(req.query.page as string) : 0,
+        }
+      }
+      const {data, pagination} = await this.loanService.getAllLoans(loanQuery)
+      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Get All loans successfully", data, pagination.currentPage, pagination.totalPages, pagination.totalItems));
     } catch (error) {
       next(error)
     }

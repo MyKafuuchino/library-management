@@ -1,5 +1,6 @@
 import {z} from "zod";
 import {zodStringToNumber} from "../../utils/zod_string_to_number";
+import {paginationSchema} from "../../utils/pagination_schema";
 
 export const loanSchema = z.object({
   bookId: z.number(),
@@ -29,7 +30,13 @@ export const findLoanByIdSchema = z.object({
   })
 })
 
+export const queryLoanSchema = z.object({
+  pagination: paginationSchema
+})
+
 export type CreateLoan = z.infer<typeof createLoanSchema> & { userId: number }
 export type CreateLoans = z.infer<typeof createLoansSchema> & { userId: number }
 export type UpdateLoan = z.infer<typeof updateLoanSchema> & { userId: number | undefined }
 export type FindLoanById = z.infer<typeof findLoanByIdSchema>
+
+export type QueryLoan = z.infer<typeof queryLoanSchema>

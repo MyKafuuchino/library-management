@@ -93,4 +93,18 @@ export class UserController {
       next(error);
     }
   };
+
+  public findLoanByUserId = async (req: HttpRequest, res: HttpResponse, next: HttpNextFunction) => {
+    try {
+      const reqUser: FindUserById = {
+        params: {
+          id: parseInt(req.params["id"]),
+        },
+      };
+      const userLoans = await this.userService.findLoanByUserId(reqUser);
+      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Successfully find loans", userLoans));
+    } catch (error) {
+      next(error);
+    }
+  }
 }

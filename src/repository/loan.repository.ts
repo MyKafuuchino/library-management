@@ -2,14 +2,15 @@ import {Loan} from "@prisma/client";
 import {
   CreateLoan,
   CreateLoans,
-  FindLoanById,
+  FindLoanById, QueryLoan,
   UpdateLoan,
 } from "../route/loan/loan.validator";
 import {BaseRepository} from "./utils/base.repository";
 import {FindUserById} from "../route/user/user.validator";
+import {PaginationResponse} from "../types/pagination.types";
 
 export interface LoanRepository {
-  findAll(): Promise<Loan[]>;
+  findAll(loanQuery: QueryLoan): Promise<PaginationResponse<Loan[]>>;
 
   findById(reqLoan: FindLoanById): Promise<Loan | null>;
 
@@ -21,24 +22,42 @@ export interface LoanRepository {
 
   delete(reqLoan: FindLoanById): Promise<boolean>;
 
-  findByUserId(reqLoan: FindUserById): Promise<Loan[]>;
+  findByUserId(reqLoan: FindUserById, isReturned?: boolean | undefined): Promise<Loan[]>;
 }
 
 export class LoanRepositoryImpl extends BaseRepository implements LoanRepository {
-  public async findByUserId(reqLoan: FindUserById): Promise<Loan[]> {
+  public async findByUserId(reqLoan: FindUserById, isReturned?: boolean | undefined): Promise<Loan[]> {
     return await this.prisma.loan.findMany({
       where: {
+        isReturned: isReturned,
         userId: reqLoan.params.id
-      }
+      },
     })
   }
 
-  public async findAll(): Promise<Loan[]> {
-    return this.prisma.loan.findMany({
-      orderBy: {
-        borrowDate: "asc",
-      },
-    });
+  public async findAll(loanQuery: QueryLoan): Promise<PaginationResponse<Loan[]>> {
+    const {limit, page} = loanQuery.pagination
+    const skip = (page - 1) * limit;
+    const [data, totalLoan] = await Promise.all([
+      this.prisma.loan.findMany({
+        orderBy: {
+          borrowDate: "asc",
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.loan.count()
+    ])
+    const totalPages = Math.ceil(totalLoan / limit);
+
+    return {
+      data,
+      pagination: {
+        currentPage: page,
+        totalPages: totalPages,
+        totalItems: totalLoan
+      }
+    }
   }
 
   public async findById(reqLoan: FindLoanById): Promise<Loan | null> {

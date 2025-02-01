@@ -1,7 +1,7 @@
 import {BookService} from "../service/book.service";
 import {HttpNextFunction, HttpRequest, HttpResponse} from "../utils/http";
 import {HTTP_STATUSES} from "../constant/http_status.constant";
-import {CreateBook, CreateBooks, FindBookById, UpdateBook} from "../route/book/book.validator";
+import {CreateBook, CreateBooks, FindBookById, SearchBookQuery, UpdateBook} from "../route/book/book.validator";
 import {NewResponseSuccess} from "../utils/http_response";
 
 export class BookController {
@@ -11,10 +11,20 @@ export class BookController {
     this.bookService = bookService;
   }
 
-  public getAllBook = async (_req: HttpRequest, res: HttpResponse, next: HttpNextFunction): Promise<void> => {
+  public getAllBook = async (req: HttpRequest, res: HttpResponse, next: HttpNextFunction): Promise<void> => {
     try {
-      const booksResponse = await this.bookService.getAllBooks();
-      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Get all books successfully.", booksResponse));
+      const bookQuery: SearchBookQuery = {
+        query: {
+          title: req.query.title ? req.query.title as string : "",
+          author: req.query.author ? req.query.author as string : "",
+        },
+        pagination: {
+          limit: req.query.limit ? parseInt(req.query.limit as string) : 0,
+          page: req.query.page ? parseInt(req.query.page as string) : 0,
+        }
+      }
+      const {pagination, data} = await this.bookService.getAllBooks(bookQuery);
+      res.status(HTTP_STATUSES.OK).json(NewResponseSuccess("Get all books successfully.", data, pagination.currentPage, pagination.totalPages, pagination.totalItems));
     } catch (err) {
       next(err)
     }

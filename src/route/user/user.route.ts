@@ -6,9 +6,12 @@ import {UserServiceImpl} from "../../service/user.service";
 import {HttpRouter} from "../../utils/http";
 import {findUserById, updateUserSchema} from "./user.validator";
 import {authorizeRoles} from "../../middleware/protect_route.by_role.middleware";
+import {LoanRepositoryImpl} from "../../repository/loan.repository";
 
 const userRepository = new UserRepositoryImpl(prismaClient);
-const userService = new UserServiceImpl(userRepository);
+const loanRepository = new LoanRepositoryImpl(prismaClient);
+
+const userService = new UserServiceImpl(userRepository, loanRepository);
 const userController = new UserController(userService);
 
 const userRouter = HttpRouter();
@@ -32,5 +35,7 @@ userRouter.delete(
     validate(findUserById),
     userController.deleteUserById
 );
+
+userRouter.get("/:id/loans", authorizeRoles("ADMIN", "MANAGER"), validate(findUserById), userController.findLoanByUserId)
 
 export default userRouter;

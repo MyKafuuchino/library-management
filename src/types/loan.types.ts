@@ -6,3 +6,7 @@ export interface LoanResponse {
   returnDate: Date | null;
   isReturned: boolean;
 }
+
+export interface ReturnBookResponse extends LoanResponse {
+  penalty: number
+}
